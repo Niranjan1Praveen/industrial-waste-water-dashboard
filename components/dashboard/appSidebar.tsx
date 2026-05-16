@@ -94,7 +94,7 @@ export default function AppSidebar() {
         <SidebarHeader className="border-b">
           <div className="flex items-center justify-start gap-4">
             <ImageNext
-              src="/images/logo/logo.png"
+              src="/images/logo/logoNew2.png"
               alt="Industry Matrix Logo"
               width={30}
               height={30}
