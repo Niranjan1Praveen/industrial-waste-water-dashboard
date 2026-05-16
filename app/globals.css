@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
 
@@ -10,8 +10,8 @@
 
 :root {
   /* Deep Navy */
-  --accent-teal: #14B8A6;
-  --accent-cyan: #06B6D4;
+  --accent-teal: #14b8a6;
+  --accent-cyan: #06b6d4;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -45,14 +45,8 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-
-body {
-  background-color: var(--background);
-  font-family: 'IBM Plex Sans', sans-serif;
-}
-
-.font-data {
-  font-family: 'IBM Plex Mono', monospace;
+html {
+  scroll-behavior: smooth;
 }
 
 @theme inline {
@@ -138,9 +132,8 @@ body {
   }
 
   body {
-    @apply bg-background text-foreground;
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
   }
-
   html {
     @apply font-sans;
   }
@@ -149,8 +142,46 @@ body {
   .section {
     @apply px-8;
   }
+  button {
+    @apply cursor-pointer;
+  }
+}
+/* React Flow Styles */
+.react-flow {
+  font-family: var(--font-dm-sans);
 }
 
+.react-flow__node {
+  @apply border border-border rounded-lg bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm;
+}
+
+.react-flow__node-input {
+  @apply border-primary/50 bg-primary/5;
+}
+
+.react-flow__node-output {
+  @apply border-green-500/50 bg-green-500/5;
+}
+
+.react-flow__edge-path {
+  @apply stroke-primary stroke-2;
+}
+
+.react-flow__controls button {
+  @apply bg-card border border-border text-foreground hover:bg-accent;
+}
+
+.react-flow__controls button svg {
+  @apply fill-current;
+}
+
+.react-flow__minimap {
+  @apply bg-card border border-border rounded-lg;
+}
+
+.react-flow__attribution {
+  @apply text-muted-foreground text-xs;
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

@@ -7,7 +7,7 @@ import AppFooter from "./appFooter";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen" suppressHydrationWarning>
+    <div className="min-h-screen bg-background text-foreground" suppressHydrationWarning>
       <SidebarProvider>
         <AppSidebar />
         <main className="flex-1 flex flex-col w-full">
