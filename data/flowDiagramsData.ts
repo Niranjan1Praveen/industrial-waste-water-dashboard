@@ -609,6 +609,182 @@ export const flowDiagramsData: Record<string, FlowDiagramData> = {
     layout: "horizontal",
     title: "Activated Sludge Process - Complete Treatment Train",
   },
+  "equipment-cleaning": {
+    nodes: [
+      // Section Labels (Background boxes)
+      {
+        id: "sec1",
+        position: { x: 100, y: 20 },
+        data: { label: "Preliminary Treatment" },
+        style: { backgroundColor: "#e0e7ff", width: 180 },
+      },
+      {
+        id: "sec2",
+        position: { x: 300, y: 20 },
+        data: { label: "Primary Treatment" },
+        style: { backgroundColor: "#e0e7ff", width: 180 },
+      },
+      {
+        id: "sec3",
+        position: { x: 500, y: 20 },
+        data: { label: "Secondary Treatment" },
+        style: { backgroundColor: "#e0e7ff", width: 280 },
+      },
+      {
+        id: "sec4",
+        position: { x: 800, y: 20 },
+        data: { label: "Tertiary Treatment" },
+        style: { backgroundColor: "#e0e7ff", width: 200 },
+      },
+
+      // Treatment Units
+      {
+        id: "1",
+        position: { x: 130, y: 80 },
+        data: { label: "Influent" },
+        type: "input",
+      },
+      {
+        id: "2",
+        position: { x: 130, y: 160 },
+        data: { label: "Screening & Grit Removal" },
+      },
+      {
+        id: "3",
+        position: { x: 330, y: 120 },
+        data: { label: "Primary Clarifier" },
+      },
+      {
+        id: "4",
+        position: { x: 550, y: 120 },
+        data: { label: "Aeration Tank" },
+      },
+      {
+        id: "5",
+        position: { x: 730, y: 120 },
+        data: { label: "Secondary Clarifier" },
+      },
+      {
+        id: "6",
+        position: { x: 850, y: 80 },
+        data: { label: "Nutrient Removal" },
+      },
+      {
+        id: "7",
+        position: { x: 850, y: 160 },
+        data: { label: "Disinfection" },
+      },
+      {
+        id: "8",
+        position: { x: 950, y: 120 },
+        data: { label: "Final Effluent" },
+        type: "output",
+      },
+
+      // Sludge Line
+      {
+        id: "9",
+        position: { x: 330, y: 220 },
+        data: { label: "Primary Sludge" },
+      },
+      {
+        id: "10",
+        position: { x: 550, y: 220 },
+        data: { label: "Sludge Digester" },
+      },
+      { id: "11", position: { x: 730, y: 220 }, data: { label: "WAS" } },
+      {
+        id: "12",
+        position: { x: 850, y: 220 },
+        data: { label: "Sludge Dewatering" },
+      },
+      {
+        id: "13",
+        position: { x: 950, y: 220 },
+        data: { label: "Sludge Disposal" },
+        type: "output",
+      },
+
+      // Recycle
+      {
+        id: "14",
+        position: { x: 640, y: 180 },
+        data: { label: "Return Sludge" },
+      },
+    ],
+    edges: [
+      // Water line
+      { id: "e1-2", source: "1", target: "2", animated: true },
+      { id: "e2-3", source: "2", target: "3", animated: true },
+      { id: "e3-4", source: "3", target: "4", animated: true },
+      { id: "e4-5", source: "4", target: "5", animated: true },
+      { id: "e5-6", source: "5", target: "6", animated: true },
+      { id: "e6-7", source: "6", target: "7", animated: true },
+      { id: "e7-8", source: "7", target: "8", animated: true },
+
+      // Sludge line
+      {
+        id: "e3-9",
+        source: "3",
+        target: "9",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+      {
+        id: "e9-10",
+        source: "9",
+        target: "10",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+      {
+        id: "e5-11",
+        source: "5",
+        target: "11",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+      {
+        id: "e10-12",
+        source: "10",
+        target: "12",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+      {
+        id: "e11-12",
+        source: "11",
+        target: "12",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+      {
+        id: "e12-13",
+        source: "12",
+        target: "13",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+
+      // Recycle line
+      {
+        id: "e5-14",
+        source: "5",
+        target: "14",
+        animated: true,
+        style: { stroke: "#10b981", strokeDasharray: "5,5" },
+      },
+      {
+        id: "e14-4",
+        source: "14",
+        target: "4",
+        animated: true,
+        style: { stroke: "#10b981", strokeDasharray: "5,5" },
+      },
+    ],
+    layout: "horizontal",
+    title: "Activated Sludge Process - Complete Treatment Train",
+  }
 };
 
 // Helper function to get flow diagram data
