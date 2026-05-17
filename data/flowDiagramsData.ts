@@ -64,6 +64,101 @@ const createEdges = (nodeCount: number, animated: boolean = true): Edge[] => {
   return edges;
 };
 
+// Branched Layout Helper
+const createBranchedNodes = (
+  mainLabels: string[],
+  branchLabel: string,
+): Node[] => {
+  const nodes: Node[] = [];
+
+  // Main vertical flow
+  mainLabels.forEach((label, index) => {
+    nodes.push({
+      id: `${index + 1}`,
+      position: {
+        x: 250,
+        y: 50 + index * 100,
+      },
+      data: { label },
+      type:
+        index === 0
+          ? "input"
+          : index === mainLabels.length - 1
+            ? "output"
+            : "default",
+    });
+  });
+
+  // Side branch node
+  nodes.push({
+    id: "branch",
+    position: {
+      x: 450,
+      y: 250,
+    },
+    data: { label: branchLabel },
+    type: "default",
+  });
+
+  return nodes;
+};
+
+// Industrial Layout Helper
+const createIndustrialNodes = (
+  labels: string[],
+): Node[] => {
+  return labels.map((label, index) => ({
+    id: `${index + 1}`,
+    position: {
+      x: 120 + index * 180,                     // Creates a staggered zig-zag process layout
+      y: index % 2 === 0 ? 120 : 260,           // to mimic industrial plant piping/process flow.
+    },
+    data: { label },
+    type:
+      index === 0
+        ? "input"
+        : index === labels.length - 1
+          ? "output"
+          : "default",
+  }));
+};
+
+// Advanced Treatment Helper
+// Creates a hazard-styled layout for toxic/chemical wastewater systems.
+// Input and output nodes are centered; intermediate nodes stagger left/right
+// to visually suggest a multi-stage treatment path rather than a simple linear flow.
+const createAdvancedTreatmentNodes = (
+  labels: string[],
+): Node[] => {
+  const CENTER_X = 300;
+  const LEFT_X = 160;
+  const RIGHT_X = 440;
+  const SPACING = 110;
+
+  return labels.map((label, index) => {
+    const isFirst = index === 0;
+    const isLast = index === labels.length - 1;
+
+    // Pin first and last nodes to center; stagger everything in between
+    const x = isFirst || isLast
+      ? CENTER_X
+      : index % 2 === 0 ? LEFT_X : RIGHT_X;
+
+    return {
+      id: `${index + 1}`,
+      position: { x, y: 40 + index * SPACING },
+      data: { label },
+      style: {
+        border: "2px solid #ef4444",
+        backgroundColor: "#fef2f2",
+        color: "#7f1d1d",
+        fontWeight: 500,
+      },
+      type: isFirst ? "input" : isLast ? "output" : "default",
+    };
+  });
+};
+
 export const flowDiagramsData: Record<string, FlowDiagramData> = {
   // Textile - Denim Washing (Your detailed process)
   "denim": {
@@ -283,7 +378,7 @@ export const flowDiagramsData: Record<string, FlowDiagramData> = {
       50,
       100,
     ),
-    edges: createEdges(5, true),
+    edges: createEdges(6, true),
     layout: "vertical",
     title: "API Bulk Drug Manufacturing",
   },
@@ -959,6 +1054,857 @@ export const flowDiagramsData: Record<string, FlowDiagramData> = {
     layout: "vertical",
 
     title: "Polymer Production Wastewater Treatment",
+  },
+
+  // Meat & Poultry Processing
+  "meat": {
+    nodes: createBranchedNodes(
+      [
+        "Meat Effluent",
+        "Screening",
+        "FOG Removal",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+      "Sludge Handling",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e3-branch",
+        source: "3",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Meat Processing Wastewater Treatment",
+  },
+
+  // Fruit & Vegetable Processing
+  "fruit-veg": {
+    nodes: createVerticalNodes(
+      [
+        "Fruit & Vegetable Effluent",
+        "Screening",
+        "Equalization",
+        "pH Adjustment",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+      250,
+      50,
+      100,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Fruit & Vegetable Wastewater Treatment",
+  },
+
+  // CIP Operations
+  "cip": {
+    nodes: createHorizontalNodes(
+      [
+        "CIP Effluent",
+        "Equalization",
+        "Neutralization",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "CIP Wastewater Treatment",
+  },
+
+  // Ammonia & Urea
+  "ammonia": {
+    nodes: createHorizontalNodes(
+      [
+        "Ammonia Effluent",
+        "Equalization",
+        "Ammonia Stripping",
+        "Neutralization",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Ammonia Wastewater Treatment",
+  },
+
+  // Phosphate Fertilizer
+  "phosphate": {
+    nodes: createIndustrialNodes(
+      [
+        "Phosphate Effluent",
+        "Neutralization",
+        "Fluoride Removal",
+        "Chemical Precipitation",
+        "Clarification",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Phosphate Wastewater Treatment",
+  },
+
+  // Nitrate Fertilizer
+  "nitrate": {
+    nodes: createHorizontalNodes(
+      [
+        "Nitrate Effluent",
+        "Equalization",
+        "Denitrification",
+        "Biological Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Nitrate Wastewater Treatment",
+  },
+
+  // Granulation
+  "granulation": {
+    nodes: createBranchedNodes(
+      [
+        "Granulation Effluent",
+        "Screening",
+        "Chemical Treatment",
+        "Clarification",
+        "Final Discharge",
+      ],
+      "Dust Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e3-branch",
+        source: "3",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Granulation Wastewater Treatment",
+  },
+
+  // Coke Ovens
+  "coke-ovens": {
+    nodes: createIndustrialNodes(
+      [
+        "Coke Oven Effluent",
+        "Oil Separation",
+        "Ammonia Removal",
+        "Phenol Treatment",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Coke Oven Wastewater Treatment",
+  },
+
+  // Blast Furnace
+  "blast-furnace": {
+    nodes: createIndustrialNodes(
+      [
+        "Blast Furnace Water",
+        "Cooling",
+        "Clarification",
+        "Sludge Removal",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Blast Furnace Wastewater Treatment",
+  },
+
+  // Rolling Mill
+  "rolling-mill": {
+    nodes: createIndustrialNodes(
+      [
+        "Rolling Mill Effluent",
+        "Oil Separation",
+        "Scale Removal",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Rolling Mill Wastewater Treatment",
+  },
+
+  // Pickling
+  "pickling": {
+    nodes: createIndustrialNodes(
+      [
+        "Pickling Effluent",
+        "Neutralization",
+        "Metal Precipitation",
+        "Clarification",
+        "Sludge Handling",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Pickling Wastewater Treatment",
+  },
+
+  // Gas Scrubbing
+  "gas-scrubbing": {
+    nodes: createIndustrialNodes(
+      [
+        "Scrubber Effluent",
+        "Equalization",
+        "Chemical Treatment",
+        "Heavy Metal Removal",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Gas Scrubbing Wastewater Treatment",
+  },
+
+  // Electroplating
+  "electroplating-ops": {
+    nodes: createBranchedNodes(
+      [
+        "Electroplating Effluent",
+        "Cyanide Destruction",
+        "Metal Precipitation",
+        "Filtration",
+        "Final Discharge",
+      ],
+      "Hazardous Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e3-branch",
+        source: "3",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Electroplating Wastewater Treatment",
+  },
+
+  // Acid Pickling & Etching
+  "acid-pickling-etching": {
+    nodes: createIndustrialNodes(
+      [
+        "Acid Etching Effluent",
+        "Neutralization",
+        "Metal Removal",
+        "Clarification",
+        "Sludge Handling",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Acid Pickling Wastewater Treatment",
+  },
+
+  // Surface Finishing
+  "surface-finishing": {
+    nodes: createIndustrialNodes(
+      [
+        "Surface Finishing Effluent",
+        "Equalization",
+        "Chemical Treatment",
+        "Filtration",
+        "Polishing",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Surface Finishing Wastewater Treatment",
+  },
+
+  // Cooling Tower
+  "cooling-tower": {
+    nodes: createHorizontalNodes(
+      [
+        "Cooling Tower Blowdown",
+        "Equalization",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(5, true),
+
+    layout: "horizontal",
+
+    title: "Cooling Tower Blowdown Treatment",
+  },
+
+  // Ash Handling
+  "ash-handling": {
+    nodes: createBranchedNodes(
+      [
+        "Ash Pond Effluent",
+        "Sedimentation",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      "Ash Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e2-branch",
+        source: "2",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Ash Handling Wastewater Treatment",
+  },
+
+  // Boiler Blowdown
+  "boiler-blowdown": {
+    nodes: createHorizontalNodes(
+      [
+        "Boiler Blowdown",
+        "Cooling",
+        "Neutralization",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(5, true),
+
+    layout: "horizontal",
+
+    title: "Boiler Blowdown Treatment",
+  },
+
+  // Cane Crushing
+  // Wastewater contains sugars, fibers, bagasse particles, and high organic load.
+  "cane-crushing": {
+    nodes: createVerticalNodes(
+      [
+        "Cane Crushing Effluent",
+        "Screening",
+        "Equalization",
+        "Biological Treatment",
+        "Clarification",
+        "Final Discharge",
+      ],
+      250,
+      50,
+      100,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Cane Crushing Wastewater Treatment",
+  },
+
+  // Clarification
+  // Wastewater contains press mud, suspended solids, and organic sludge.
+  "clarification": {
+    nodes: createBranchedNodes(
+      [
+        "Clarifier Effluent",
+        "Settling",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      "Press Mud Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e2-branch",
+        source: "2",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Sugar Clarification Wastewater Treatment",
+  },
+
+  // Distillery Integration
+  // Combined wastewater from sugar and molasses distillery operations with very high COD/BOD.
+  "distillery-int": {
+    nodes: createBranchedNodes(
+      [
+        "Integrated Distillery Effluent",
+        "Equalization",
+        "Anaerobic Digestion",
+        "Aerobic Treatment",
+        "Final Discharge",
+      ],
+      "Biogas Recovery",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e3-branch",
+        source: "3",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#10b981" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Integrated Distillery Wastewater Treatment",
+  },
+
+  // Insecticides
+  // Wastewater contains toxic pesticide residues and persistent organic compounds.
+  "insecticides": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Pesticide Effluent",
+        "Equalization",
+        "Chemical Oxidation",
+        "Activated Carbon",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Insecticide Wastewater Treatment",
+  },
+
+  // Herbicides
+  // Wastewater contains herbicidal compounds requiring advanced oxidation treatment.
+  "herbicides": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Herbicide Effluent",
+        "Equalization",
+        "Advanced Oxidation",
+        "Activated Carbon",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Herbicide Wastewater Treatment",
+  },
+
+  // Fungicides
+  // Wastewater contains toxic organics and heavy metal catalyst residues.
+  "fungicides": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Fungicide Effluent",
+        "Equalization",
+        "Metal Removal",
+        "Chemical Oxidation",
+        "Activated Carbon",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Fungicide Wastewater Treatment",
+  },
+
+  // Chlor-Alkali
+  // Wastewater contains chlorine, high salinity, and alkaline compounds.
+  "chlor-alkali": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Chlor-Alkali Effluent",
+        "Neutralization",
+        "Dechlorination",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Chlor-Alkali Wastewater Treatment",
+  },
+
+  // Acid-Alkali
+  // Wastewater contains extreme pH streams requiring intensive neutralization.
+  "acid-alkali": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Acid-Alkali Effluent",
+        "Equalization",
+        "Neutralization",
+        "Chemical Treatment",
+        "Clarification",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Acid-Alkali Wastewater Treatment",
+  },
+
+  // Dye & Pigments
+  // Wastewater contains intense color, toxic dyes, and non-biodegradable organics.
+  "dye-pigments": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Dye Effluent",
+        "Equalization",
+        "Color Removal",
+        "Advanced Oxidation",
+        "Activated Carbon",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Dye & Pigment Wastewater Treatment",
+  },
+
+  // Slaughtering
+  // Wastewater contains blood, fats, proteins, and high pathogen load.
+  "slaughtering": {
+    nodes: createBranchedNodes(
+      [
+        "Slaughterhouse Effluent",
+        "Screening",
+        "FOG Removal",
+        "Biological Treatment",
+        "Disinfection",
+        "Final Discharge",
+      ],
+      "Sludge Handling",
+    ),
+
+    edges: [
+      ...createEdges(6, true),
+      {
+        id: "e3-branch",
+        source: "3",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Slaughterhouse Wastewater Treatment",
+  },
+
+  // Rendering
+  // Wastewater contains fats, oils, grease, and high organic solids.
+  "rendering": {
+    nodes: createBranchedNodes(
+      [
+        "Rendering Effluent",
+        "FOG Removal",
+        "Equalization",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+      "Organic Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e2-branch",
+        source: "2",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Rendering Wastewater Treatment",
+  },
+
+  // Sanitation
+  // Wastewater contains detergents, pathogens, and cleaning chemicals.
+  "sanitation": {
+    nodes: createVerticalNodes(
+      [
+        "Sanitation Effluent",
+        "Equalization",
+        "Chemical Treatment",
+        "Biological Treatment",
+        "Disinfection",
+        "Final Discharge",
+      ],
+      250,
+      50,
+      100,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Sanitation Wastewater Treatment",
+  },
+
+  // Ore Washing
+  // Wastewater contains heavy suspended solids and mineral particulates.
+  "ore-washing": {
+    nodes: createBranchedNodes(
+      [
+        "Ore Wash Effluent",
+        "Sedimentation",
+        "Clarification",
+        "Filtration",
+        "Final Discharge",
+      ],
+      "Tailings Sludge",
+    ),
+
+    edges: [
+      ...createEdges(5, true),
+      {
+        id: "e2-branch",
+        source: "2",
+        target: "branch",
+        animated: true,
+        style: { stroke: "#8b5cf6" },
+      },
+    ],
+
+    layout: "vertical",
+
+    title: "Ore Washing Wastewater Treatment",
+  },
+
+  // Flotation
+  // Wastewater contains flotation chemicals, heavy metals, and mineral fines.
+  "flotation": {
+    nodes: createIndustrialNodes(
+      [
+        "Flotation Effluent",
+        "Chemical Treatment",
+        "Metal Removal",
+        "Clarification",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Flotation Wastewater Treatment",
+  },
+
+  // Acid Mine Drainage
+  // Wastewater contains acidic water and dissolved heavy metals.
+  "amd": {
+    nodes: createAdvancedTreatmentNodes(
+      [
+        "Acid Mine Drainage",
+        "Neutralization",
+        "Metal Precipitation",
+        "Clarification",
+        "Filtration",
+        "Final Discharge",
+      ],
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "vertical",
+
+    title: "Acid Mine Drainage Treatment",
+  },
+
+  // Personal Care
+  // Wastewater contains surfactants, fragrances, and cosmetic chemicals.
+  "personal-care": {
+    nodes: createHorizontalNodes(
+      [
+        "Personal Care Effluent",
+        "Equalization",
+        "Chemical Treatment",
+        "Biological Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Personal Care Wastewater Treatment",
+  },
+
+  // Home Care
+  // Wastewater contains detergents, phosphates, and cleaning chemicals.
+  "home-care": {
+    nodes: createHorizontalNodes(
+      [
+        "Home Care Effluent",
+        "Equalization",
+        "Neutralization",
+        "Chemical Treatment",
+        "Biological Treatment",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Home Care Wastewater Treatment",
+  },
+
+  // Cosmetics
+  // Wastewater contains oils, waxes, pigments, and synthetic organics.
+  "cosmetics": {
+    nodes: createHorizontalNodes(
+      [
+        "Cosmetic Effluent",
+        "Oil Separation",
+        "Equalization",
+        "Chemical Treatment",
+        "Filtration",
+        "Final Discharge",
+      ],
+      50,
+      250,
+      170,
+    ),
+
+    edges: createEdges(6, true),
+
+    layout: "horizontal",
+
+    title: "Cosmetics Wastewater Treatment",
   },
 };
 
