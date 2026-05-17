@@ -76,7 +76,7 @@ export default function AppSidebar() {
       setExpandedIds(new Set([industryId]));
     } else {
       // Toggle the submenu without closing others
-      setExpandedIds(prev => {
+      setExpandedIds((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(industryId)) {
           newSet.delete(industryId); // Close if already open
@@ -113,7 +113,8 @@ export default function AppSidebar() {
               <SidebarMenu>
                 {industries.map((industry) => {
                   const isExpanded = expandedIds.has(industry.id);
-                  const IconComponent = industryIcons[industry.id] || FaIndustry;
+                  const IconComponent =
+                    industryIcons[industry.id] || FaIndustry;
 
                   return (
                     <SidebarMenuItem key={industry.id}>
@@ -126,13 +127,12 @@ export default function AppSidebar() {
                           <IconComponent className="h-4 w-4 shrink-0" />
                           <span className="truncate">{industry.name}</span>
                         </div>
-                        {!isCollapsed && (
-                          isExpanded ? (
+                        {!isCollapsed &&
+                          (isExpanded ? (
                             <ChevronDown className="h-4 w-4 shrink-0" />
                           ) : (
                             <ChevronRight className="h-4 w-4 shrink-0" />
-                          )
-                        )}
+                          ))}
                       </SidebarMenuButton>
 
                       {!isCollapsed && isExpanded && (
