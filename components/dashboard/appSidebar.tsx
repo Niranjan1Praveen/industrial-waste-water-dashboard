@@ -20,6 +20,8 @@ import {
   FaBox,
   FaAppleAlt,
   FaBatteryFull,
+  FaAccessibleIcon,
+  FaHome,
 } from "react-icons/fa";
 import ImageNext from "next/image";
 import { industries } from "@/data/industries";
@@ -38,6 +40,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { UserButton, useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 // Map industry IDs to their respective icons from react-icons
 const industryIcons: Record<string, React.ElementType> = {
@@ -111,6 +114,19 @@ export default function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
+                <Link href="/dashboard/overview" className="block">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className="w-full justify-between"
+                      tooltip={isCollapsed ? "Overview" : undefined}
+                    >
+                      <div className="flex items-center gap-3">
+                        <FaHome className="h-4 w-4 shrink-0" />
+                        <span className="truncate">Overview</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
                 {industries.map((industry) => {
                   const isExpanded = expandedIds.has(industry.id);
                   const IconComponent =
@@ -125,7 +141,9 @@ export default function AppSidebar() {
                       >
                         <div className="flex items-center gap-3">
                           <IconComponent className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{industry.name}</span>
+                          <Link href={`/dashboard`}>
+                            <span className="truncate">{industry.name}</span>
+                          </Link>
                         </div>
                         {!isCollapsed &&
                           (isExpanded ? (
@@ -140,8 +158,9 @@ export default function AppSidebar() {
                           <SidebarMenu className="gap-1">
                             {industry.subCategories.map((sub) => (
                               <SidebarMenuItem key={sub.id}>
-                                <button
+                                <Link
                                   onClick={() => setSelectedSubCategory(sub)}
+                                  href={`/dashboard`}
                                   className="
                                     flex w-full items-center rounded-md px-2 py-2
                                     text-left text-sm transition-colors
@@ -149,7 +168,7 @@ export default function AppSidebar() {
                                   "
                                 >
                                   {sub.name}
-                                </button>
+                                </Link>
                               </SidebarMenuItem>
                             ))}
                           </SidebarMenu>

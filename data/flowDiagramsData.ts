@@ -63,10 +63,9 @@ const createEdges = (nodeCount: number, animated: boolean = true): Edge[] => {
   return edges;
 };
 
-// Flow diagram data for each sub-category
 export const flowDiagramsData: Record<string, FlowDiagramData> = {
   // Textile - Denim Washing (Your detailed process)
-  "denim-washing": {
+  "denim": {
     nodes: [
       {
         id: "1",
