@@ -129,20 +129,23 @@ export default function WelcomeScreen() {
                 <Heart className="w-6 h-6 text-primary" />
               </div>
               <div className="space-y-3 mb-5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Step 1</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
                   <span className="text-sm text-foreground">
                     Select an industry
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Step 2</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
                   <span className="text-sm text-foreground">
                     Choose sub-category
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Step 3</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
                   <span className="text-sm text-foreground">
                     View & analyze data
                   </span>
