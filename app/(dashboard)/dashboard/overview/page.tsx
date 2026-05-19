@@ -132,7 +132,7 @@ export default function WelcomeScreen() {
               </div>
               <div className="border border-border rounded-lg p-4 bg-card">
                 <p className="text-sm font-semibold text-foreground">
-                  🧪 UV-VIS Spectrophotometer
+                  UV-VIS Spectrophotometer
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   COD, nitrate, phosphate analysis
@@ -140,7 +140,7 @@ export default function WelcomeScreen() {
               </div>
               <div className="border border-border rounded-lg p-4 bg-card">
                 <p className="text-sm font-semibold text-foreground">
-                  💨 Gas Chromatograph
+                  Gas Chromatograph
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Volatile organic compound detection
