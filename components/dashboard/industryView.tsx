@@ -173,10 +173,6 @@ export default function IndustryView({
                 <CheckCircle2 className="w-4 h-4" />
                 Generate Report
               </button>
-              <div className="text-right">
-                <div className="text-3xl font-bold">{treatmentEfficiency}%</div>
-                <p className="text-xs ">Treatment Efficiency</p>
-              </div>
             </div>
           </div>
         </div>
