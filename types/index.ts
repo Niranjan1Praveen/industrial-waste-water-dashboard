@@ -1,7 +1,6 @@
-// ============================================================
-// Core Domain Types — Hitesh Enviro Engineers Pvt. Ltd.
-// ============================================================
+import { Node, Edge } from "reactflow";
 
+// Core Domain Types — Hitesh Enviro Engineers Pvt. Ltd.
 export interface SubCategory {
   id: string;
   name: string;
@@ -26,10 +25,7 @@ export interface Industry {
   subCategories: SubCategory[];
 }
 
-// ============================================================
 // Water Quality Parameters
-// ============================================================
-
 export interface ParameterConfig {
   key: keyof WaterParameters;
   label: string;
@@ -54,10 +50,7 @@ export interface WaterParameters {
   tds: number;   // Total Dissolved Solids (mg/L)
 }
 
-// ============================================================
 // UI / Selection State
-// ============================================================
-
 export interface SelectionState {
   industryId: string | null;
   subCategoryId: string | null;
@@ -68,10 +61,7 @@ export interface ParameterPanelState {
   parameters: WaterParameters;
 }
 
-// ============================================================
 // Icon Keys — extend as you add new industries
-// ============================================================
-
 export type IndustryIconKey =
   | "pharma"
   | "distillery"
@@ -91,10 +81,7 @@ export type IndustryIconKey =
   | "mining"
   | "fmcg";
 
-// ============================================================
 // Future-ready: API response types for risk/treatment engine
-// ============================================================
-
 export interface RiskPrediction {
   riskLevel: "low" | "medium" | "high" | "critical";
   riskScore: number;        // 0–100
@@ -119,4 +106,11 @@ export interface AnalysisResult {
   risks: RiskPrediction[];
   treatments: TreatmentRecommendation[];
   timestamp: string;
+}
+
+export interface FlowDiagramData {
+  nodes: Node[];
+  edges: Edge[];
+  layout?: "vertical" | "horizontal";
+  title?: string;
 }

@@ -12,7 +12,9 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { getFlowDiagramData, hasFlowDiagram, FlowDiagramData } from '@/data/flowDiagramsData';
+import { flowDiagramsData } from '@/data/flowDiagramsData';
+import type { FlowDiagramData } from '@/types';
+// import { getFlowDiagramData, hasFlowDiagram, FlowDiagramData } from '@/data/flowDiagramsData';
 
 interface IndustryFlowDiagramProps {
   industryId: string;
@@ -35,17 +37,16 @@ const getDefaultFlowData = (): FlowDiagramData => ({
 });
 
 export default function IndustryFlowDiagram({ industryId, subCategoryName }: IndustryFlowDiagramProps) {
-  const [flowData, setFlowData] = useState<FlowDiagramData | null>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const flowData =
+  flowDiagramsData[industryId] || getDefaultFlowData();
+  const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges);
 
   // Load flow diagram data when industry changes
   useEffect(() => {
-    const data = getFlowDiagramData(industryId) || getDefaultFlowData();
-    setFlowData(data);
-    setNodes(data.nodes);
-    setEdges(data.edges);
-  }, [industryId, setNodes, setEdges]);
+  setNodes(flowData.nodes);
+  setEdges(flowData.edges);
+}, [industryId]);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
