@@ -7,10 +7,10 @@ import {
   Droplets,
   FileDown,
   Settings,
+  Shield,
 } from "lucide-react";
 
 export default function WelcomeScreen() {
-
   const industriesCount = 17;
   const subCategoriesCount = 50;
   const dataPointsCount = 500;
@@ -27,7 +27,9 @@ export default function WelcomeScreen() {
             Overview
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Industrial wastewater treatment & parameter optimization
+            Comprehensive guide to industrial wastewater parameters, treatment
+            technologies, and regulatory compliance standards across 17+
+            industry sectors
           </p>
         </div>
       </div>
@@ -357,6 +359,219 @@ export default function WelcomeScreen() {
                   ⚠️ Cooling tower blowdown often exceeds ambient temperature by
                   10-15°C
                 </p>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+        {/* Regulatory Compliance Dashboard */}
+        <Reveal delay={480}>
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Regulatory Compliance Standards
+            </h3>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Compliance Card */}
+              <div className="border border-border rounded-lg p-4 bg-card lg:col-span-2">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground">
+                          Parameter
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground">
+                          CPCB (India)
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground">
+                          EPA (US)
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground">
+                          EU Standards
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-foreground">
+                          Industry Average
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          BOD (mg/L)
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;30
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;30
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;25
+                        </td>
+                        <td className="px-3 py-2 text-xs text-red-500 font-medium">
+                          250-45,000
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          COD (mg/L)
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;250
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;250
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;200
+                        </td>
+                        <td className="px-3 py-2 text-xs text-red-500 font-medium">
+                          1,500-100,000
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          TSS (mg/L)
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;100
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;30
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;35
+                        </td>
+                        <td className="px-3 py-2 text-xs text-red-500 font-medium">
+                          500-5,000
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          pH Range
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          6.5-8.5
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          6.0-9.0
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          6.5-8.5
+                        </td>
+                        <td className="px-3 py-2 text-xs text-yellow-500">
+                          2.5-11.5
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          TDS (mg/L)
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;2100
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          -
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          -
+                        </td>
+                        <td className="px-3 py-2 text-xs text-red-500">
+                          3,000-30,000
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-muted/50">
+                        <td className="px-3 py-2 text-xs font-medium text-foreground">
+                          Oil & Grease
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;10
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;10
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          &lt;10
+                        </td>
+                        <td className="px-3 py-2 text-xs text-red-500">
+                          100-2,000
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 text-center">
+                  Values represent maximum permissible limits | Industry average
+                  shows typical untreated effluent ranges
+                </p>
+              </div>
+
+              {/* Compliance Status by Industry */}
+              <div className="border border-border rounded-lg p-4 bg-card">
+                <h4 className="text-sm font-semibold text-foreground mb-3">
+                  Industry Compliance Status
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-foreground">Distillery</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-red-200 rounded-full overflow-hidden">
+                        <div className="w-1/4 h-full bg-red-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs text-red-500">Critical</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-foreground">Textile</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-yellow-200 rounded-full overflow-hidden">
+                        <div className="w-1/2 h-full bg-yellow-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs text-yellow-500">High Risk</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-foreground">Tannery</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-red-200 rounded-full overflow-hidden">
+                        <div className="w-1/3 h-full bg-red-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs text-red-500">Critical</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-foreground">
+                      Pharmaceutical
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-yellow-200 rounded-full overflow-hidden">
+                        <div className="w-2/3 h-full bg-yellow-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs text-yellow-500">Moderate</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-foreground">Dairy</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 h-2 bg-green-200 rounded-full overflow-hidden">
+                        <div className="w-4/5 h-full bg-green-500 rounded-full"></div>
+                      </div>
+                      <span className="text-xs text-green-500">Improving</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-border">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Overall Compliance Rate
+                    </span>
+                    <span className="font-bold text-foreground">42%</span>
+                  </div>
+                  <div className="w-full h-2 bg-muted rounded-full mt-1 overflow-hidden">
+                    <div className="w-[42%] h-full bg-primary rounded-full"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

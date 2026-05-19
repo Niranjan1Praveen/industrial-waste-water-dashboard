@@ -253,18 +253,16 @@ export default function IndustryView({
           </Reveal>
         </div>
         {/* Process Flow Diagram - Interactive */}
-        <Reveal delay={400}>
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" />
-              Process Flow Diagram
-            </h3>
-            <IndustryFlowDiagram
-              industryId={selectedSubCategory.id}
-              subCategoryName={selectedSubCategory.name}
-            />
-          </div>
-        </Reveal>
+        <div className="mb-8">
+          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-primary" />
+            Process Flow Diagram
+          </h3>
+          <IndustryFlowDiagram
+            industryId={selectedSubCategory.id}
+            subCategoryName={selectedSubCategory.name}
+          />
+        </div>
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Left Column: Challenges Panel */}

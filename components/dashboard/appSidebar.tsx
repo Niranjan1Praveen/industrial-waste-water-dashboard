@@ -97,11 +97,11 @@ export default function AppSidebar() {
         <SidebarHeader className="border-b">
           <div className="flex items-center justify-start gap-4">
             <ImageNext
-              src="/images/logo/logoNew2.png"
+              src="/images/logo/logo.webp"
               alt="Industry Matrix Logo"
               width={30}
               height={30}
-              className="object-contain"
+              className="object-contain bg-white rounded-full"
               loading="eager"
             />
             <span className="text-sm font-semibold tracking-wide uppercase truncate">
