@@ -6,7 +6,7 @@ import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 
 const AppNavbar: React.FC = () => {
   return (
-    <nav className="p-4 flex items-center justify-between z-10">
+    <nav className="sticky top-0 w-full p-4 flex items-center justify-between z-10">
       {/* LEFT */}
       <SidebarTrigger />
       {/* RIGHT */}

@@ -6,8 +6,7 @@ import WelcomeScreen from "@/components/dashboard/welcomeScreen";
 import IndustryView from "@/components/dashboard/industryView";
 
 export default function DashboardPage() {
-  const { selectedSubCategory, parameters, handleParameterChange } =
-    useDashboard();
+  const { selectedSubCategory } = useDashboard();
 
   if (!selectedSubCategory) {
     return <WelcomeScreen />;
@@ -15,11 +14,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <IndustryView
-        selectedSubCategory={selectedSubCategory}
-        parameters={parameters}
-        handleParameterChange={handleParameterChange}
-      />
+      <IndustryView selectedSubCategory={selectedSubCategory} />
     </div>
   );
 }
