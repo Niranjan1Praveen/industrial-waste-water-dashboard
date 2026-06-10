@@ -113,4 +113,5 @@ export interface FlowDiagramData {
   edges: Edge[];
   layout?: "vertical" | "horizontal";
   title?: string;
+  description?: string;
 }

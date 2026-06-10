@@ -7,22 +7,34 @@ interface ParameterSliderProps {
   min: number;
   max: number;
   unit: string;
+  step?: number;
   onChange: (val: number) => void;
+  disabled?: boolean;
 }
 
-export default function ParameterSlider({ label, value, min, max, unit, onChange }: ParameterSliderProps) {
+export default function ParameterSlider({ 
+  label, 
+  value, 
+  min, 
+  max, 
+  unit, 
+  step = 1,
+  onChange,
+  disabled = false 
+}: ParameterSliderProps) {
   return (
-    <div className="bg-[#0D233A] p-4 rounded-lg border border-teal-900/30 transition-all hover:border-teal-700/50">
+    <div className={`p-4 rounded-lg border border-border transition-all ${disabled ? 'opacity-50' : 'hover:border-primary/50'}`}>
       <div className="flex justify-between items-center mb-4">
-        <label className="text-slate-300 font-ibm-sans text-sm font-medium">{label}</label>
+        <label className="text-sm font-medium text-foreground">{label}</label>
         <div className="flex items-center gap-2">
           <input
             type="number"
             value={value}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="bg-[#060B13] border border-cyan-800/50 text-cyan-400 font-data text-right w-24 px-2 py-1 rounded text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+            disabled={disabled}
+            className="bg-muted border border-border text-foreground text-right w-24 px-2 py-1 rounded text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all disabled:opacity-50"
           />
-          <span className="text-slate-500 text-xs w-8">{unit}</span>
+          <span className="text-muted-foreground text-xs w-8">{unit}</span>
         </div>
       </div>
       
@@ -30,11 +42,13 @@ export default function ParameterSlider({ label, value, min, max, unit, onChange
         type="range"
         min={min}
         max={max}
+        step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+        disabled={disabled}
+        className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary disabled:cursor-not-allowed"
       />
-      <div className="flex justify-between mt-2 text-[10px] text-slate-500 font-data">
+      <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
         <span>{min}</span>
         <span>{max}</span>
       </div>

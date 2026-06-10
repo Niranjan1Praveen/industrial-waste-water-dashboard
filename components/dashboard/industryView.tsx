@@ -7,18 +7,17 @@ import {
   Calendar,
   BarChart3,
   CheckCircle2,
-  ArrowRight,
   AlertCircle,
   FileDown,
   Loader2,
   Brain,
   TrendingUp,
-  TrendingDown,
   AlertTriangle,
 } from "lucide-react";
 import Reveal from "@/components/reveal";
 import dynamic from "next/dynamic";
 import { FaPills } from "react-icons/fa";
+import ParameterCustomizer from "@/components/dashboard/parameterCustomizer";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://heepl-ai-agents.onrender.com";
@@ -64,14 +63,30 @@ const IndustryFlowDiagram = dynamic(
   },
 );
 
-export default function IndustryView({
-  selectedSubCategory,
-}: IndustryViewProps) {
+export default function IndustryView({ selectedSubCategory }: IndustryViewProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [flowDiagramPath, setFlowDiagramPath] = useState<string | null>(null);
+  const [userParameters, setUserParameters] = useState<{
+    bod: number;
+    cod: number;
+    tss: number;
+    tds: number;
+    ph: number;
+    oilGrease: number;
+  } | null>(null);
+
+  // Default parameter values from industry typical values
+  const defaultParameters = {
+    bod: selectedSubCategory.typicalValues?.bod || 1000,
+    cod: selectedSubCategory.typicalValues?.cod || 2000,
+    tss: selectedSubCategory.typicalValues?.tss || 500,
+    tds: selectedSubCategory.typicalValues?.tds || 2000,
+    ph: selectedSubCategory.typicalValues?.ph || 7.0,
+    oilGrease: selectedSubCategory.typicalValues?.oilGrease || 100,
+  };
 
   // Try to load flow diagram when component mounts or selectedSubCategory changes
   useEffect(() => {
@@ -88,54 +103,67 @@ export default function IndustryView({
     img.src = possiblePaths[0];
   }, [selectedSubCategory]);
 
-  // Fetch analysis from API when industry is selected
+  // Reset analysis when industry changes
   useEffect(() => {
-    const fetchAnalysis = async () => {
-      setIsAnalyzing(true);
-      setError(null);
+    setAnalysisData(null);
+    setUserParameters(null);
+    setError(null);
+  }, [selectedSubCategory.id]);
 
-      // Create a sample based on typical values from the industry
-      const sampleData = {
-        Sample_ID: `${selectedSubCategory.id.toUpperCase()}_001`,
-        "BOD (mg/L)": selectedSubCategory.typicalValues?.bod || 1000,
-        "COD (mg/L)": selectedSubCategory.typicalValues?.cod || 2000,
-        "TSS (mg/L)": selectedSubCategory.typicalValues?.tss || 500,
-        "TDS (mg/L)": selectedSubCategory.typicalValues?.tds || 2000,
-        pH: selectedSubCategory.typicalValues?.ph || 7.0,
-        "Oil & Grease (mg/L)":
-          selectedSubCategory.typicalValues?.oilGrease || 100,
-      };
+  const handleAnalyze = async (parameters: {
+    bod: number;
+    cod: number;
+    tss: number;
+    tds: number;
+    ph: number;
+    oilGrease?: number;
+  }) => {
+    setIsAnalyzing(true);
+    setError(null);
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/analyze/with-insights`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            sample: sampleData,
-            industry_id: selectedSubCategory.id,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setAnalysisData(data);
-      } catch (err) {
-        console.error("Error fetching analysis:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to analyze sample",
-        );
-      } finally {
-        setIsAnalyzing(false);
-      }
+    // Ensure oilGrease has a default value
+    const fullParameters = {
+      ...parameters,
+      oilGrease: parameters.oilGrease ?? 100,
     };
 
-    fetchAnalysis();
-  }, [selectedSubCategory]);
+    setUserParameters(fullParameters);
+
+    const sampleData = {
+      Sample_ID: `${selectedSubCategory.id.toUpperCase()}_CUSTOM`,
+      "BOD (mg/L)": fullParameters.bod,
+      "COD (mg/L)": fullParameters.cod,
+      "TSS (mg/L)": fullParameters.tss,
+      "TDS (mg/L)": fullParameters.tds,
+      pH: fullParameters.ph,
+      "Oil & Grease (mg/L)": fullParameters.oilGrease,
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/analyze/with-insights`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sample: sampleData,
+          industry_id: selectedSubCategory.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAnalysisData(data);
+    } catch (err) {
+      console.error("Error fetching analysis:", err);
+      setError(err instanceof Error ? err.message : "Failed to analyze sample");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleDownloadCSV = async () => {
     setIsDownloading(true);
@@ -214,14 +242,16 @@ export default function IndustryView({
   const getAnomalyIcon = (isAnomaly: boolean, score: number) => {
     if (!isAnomaly) return null;
     if (score < -0.6) return <TrendingUp className="w-4 h-4 text-red-500" />;
-    if (score < -0.3)
-      return <AlertCircle className="w-4 h-4 text-orange-500" />;
+    if (score < -0.3) return <AlertCircle className="w-4 h-4 text-orange-500" />;
     return <AlertCircle className="w-4 h-4 text-yellow-500" />;
   };
 
   const severityInfo = analysisData?.insights?.severity_level
     ? getSeverityInfo(analysisData.insights.severity_level)
     : getSeverityInfo("normal");
+
+  // Get the parameters to display in metrics (user values or default)
+  const displayParameters = userParameters || defaultParameters;
 
   return (
     <div className="section min-h-screen">
@@ -243,9 +273,7 @@ export default function IndustryView({
             <div className="flex gap-2 items-center flex-wrap">
               <button
                 onClick={handleDownloadCSV}
-                disabled={
-                  isDownloading || !industryPathMapping[selectedSubCategory.id]
-                }
+                disabled={isDownloading || !industryPathMapping[selectedSubCategory.id]}
                 className="px-4 py-2 text-sm border rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isDownloading ? (
@@ -271,90 +299,63 @@ export default function IndustryView({
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Key Metrics Grid - Using analysis data or fallback */}
+        {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Reveal delay={80}>
-            <div className="border rounded-lg p-4">
-              <Heart className="w-6 h-6 text-red-500 mb-2" />
-              <p className="text-xs mb-1">BOD Level</p>
-              <p className="text-xl font-bold">
-                {analysisData?.analysis?.violations
-                  ?.find((v) => v.parameter.includes("BOD"))
-                  ?.value?.toLocaleString() ||
-                  selectedSubCategory.typicalValues?.bod?.toLocaleString() ||
-                  "N/A"}{" "}
-                <span className="text-sm">mg/L</span>
+          <div className="border rounded-lg p-4">
+            <Heart className="w-6 h-6 text-red-500 mb-2" />
+            <p className="text-xs text-muted-foreground mb-1">BOD Level</p>
+            <p className="text-xl font-bold text-foreground">
+              {displayParameters.bod.toLocaleString()}{" "}
+              <span className="text-sm">mg/L</span>
+            </p>
+            {selectedSubCategory.typicalValues?.bod && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Typical: {selectedSubCategory.typicalValues.bod.toLocaleString()} mg/L
               </p>
-              {selectedSubCategory.typicalValues?.bod && (
-                <p className="text-xs mt-1">
-                  Typical:{" "}
-                  {selectedSubCategory.typicalValues.bod.toLocaleString()} mg/L
-                </p>
-              )}
-            </div>
-          </Reveal>
+            )}
+          </div>
 
-          <Reveal delay={160}>
-            <div className="border rounded-lg p-4">
-              <BarChart3 className="w-6 h-6 text-blue-500 mb-2" />
-              <p className="text-xs mb-1">COD Level</p>
-              <p className="text-xl font-bold">
-                {analysisData?.analysis?.violations
-                  ?.find((v) => v.parameter.includes("COD"))
-                  ?.value?.toLocaleString() ||
-                  selectedSubCategory.typicalValues?.cod?.toLocaleString() ||
-                  "N/A"}{" "}
-                <span className="text-sm">mg/L</span>
+          <div className="border rounded-lg p-4">
+            <BarChart3 className="w-6 h-6 text-blue-500 mb-2" />
+            <p className="text-xs text-muted-foreground mb-1">COD Level</p>
+            <p className="text-xl font-bold text-foreground">
+              {displayParameters.cod.toLocaleString()}{" "}
+              <span className="text-sm">mg/L</span>
+            </p>
+            {selectedSubCategory.typicalValues?.cod && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Typical: {selectedSubCategory.typicalValues.cod.toLocaleString()} mg/L
               </p>
-              {selectedSubCategory.typicalValues?.cod && (
-                <p className="text-xs mt-1">
-                  Typical:{" "}
-                  {selectedSubCategory.typicalValues.cod.toLocaleString()} mg/L
-                </p>
-              )}
-            </div>
-          </Reveal>
+            )}
+          </div>
 
-          <Reveal delay={240}>
-            <div className="border rounded-lg p-4">
-              <Trophy className="w-6 h-6 mb-2" />
-              <p className="text-xs mb-1">TSS Level</p>
-              <p className="text-xl font-bold">
-                {analysisData?.analysis?.violations
-                  ?.find((v) => v.parameter.includes("TSS"))
-                  ?.value?.toLocaleString() ||
-                  selectedSubCategory.typicalValues?.tss?.toLocaleString() ||
-                  "N/A"}{" "}
-                <span className="text-sm">mg/L</span>
+          <div className="border rounded-lg p-4">
+            <Trophy className="w-6 h-6 text-amber-500 mb-2" />
+            <p className="text-xs text-muted-foreground mb-1">TSS Level</p>
+            <p className="text-xl font-bold text-foreground">
+              {displayParameters.tss.toLocaleString()}{" "}
+              <span className="text-sm">mg/L</span>
+            </p>
+            {selectedSubCategory.typicalValues?.tss && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Typical: {selectedSubCategory.typicalValues.tss.toLocaleString()} mg/L
               </p>
-              {selectedSubCategory.typicalValues?.tss && (
-                <p className="text-xs mt-1">
-                  Typical:{" "}
-                  {selectedSubCategory.typicalValues.tss.toLocaleString()} mg/L
-                </p>
-              )}
-            </div>
-          </Reveal>
+            )}
+          </div>
 
-          <Reveal delay={320}>
-            <div className="border rounded-lg p-4">
-              <Calendar className="w-6 h-6 text-green-500 mb-2" />
-              <p className="text-xs mb-1">pH Level</p>
-              <p className="text-xl font-bold">
-                {analysisData?.analysis?.violations?.find((v) =>
-                  v.parameter.includes("pH"),
-                )?.value ||
-                  selectedSubCategory.typicalValues?.ph ||
-                  "N/A"}{" "}
-                <span className="text-sm">pH</span>
+          <div className="border rounded-lg p-4">
+            <Calendar className="w-6 h-6 text-green-500 mb-2" />
+            <p className="text-xs text-muted-foreground mb-1">pH Level</p>
+            <p className="text-xl font-bold text-foreground">
+              {displayParameters.ph}{" "}
+              <span className="text-sm">pH</span>
+            </p>
+            {selectedSubCategory.typicalValues?.ph && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Typical: {selectedSubCategory.typicalValues.ph}
               </p>
-              {selectedSubCategory.typicalValues?.ph && (
-                <p className="text-xs mt-1">
-                  Typical: {selectedSubCategory.typicalValues.ph}
-                </p>
-              )}
-            </div>
-          </Reveal>
+            )}
+          </div>
         </div>
 
         {/* Process Flow Diagram - Interactive */}
@@ -368,12 +369,24 @@ export default function IndustryView({
             subCategoryName={selectedSubCategory.name}
           />
         </div>
+
+        {/* Parameter Customizer - BELOW Flow Diagram */}
+        <div className="mb-8">
+          <ParameterCustomizer
+            industryId={selectedSubCategory.id}
+            industryName={selectedSubCategory.name}
+            defaultValues={defaultParameters}
+            onAnalyze={handleAnalyze}
+            isAnalyzing={isAnalyzing}
+          />
+        </div>
+
         {/* AI Analysis Loading/Error State */}
         {isAnalyzing && (
           <div className="mb-8 p-6 rounded-lg border bg-muted/20 flex items-center justify-center gap-3">
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <span className="text-sm text-muted-foreground">
-              AI is analyzing this industry...
+              AI is analyzing your custom parameters...
             </span>
           </div>
         )}
@@ -382,7 +395,7 @@ export default function IndustryView({
           <div className="mb-8 p-6 rounded-lg border border-red-200 bg-red-50">
             <p className="text-sm text-red-600">Error: {error}</p>
             <p className="text-xs text-red-500 mt-1">
-              Using fallback values for display
+              Please try adjusting parameters or check API connection
             </p>
           </div>
         )}
@@ -390,12 +403,10 @@ export default function IndustryView({
         {/* AI Insights Section */}
         {analysisData && !isAnalyzing && (
           <Reveal delay={0}>
-            <div className={`mb-8 p-6 rounded-lg border`}>
+            <div className="mb-8 p-6 rounded-lg border">
               {/* Header */}
               <div className="flex items-center gap-3 mb-6 pb-3 border-b">
-                <severityInfo.icon
-                  className={`w-6 h-6 ${severityInfo.color}`}
-                />
+                <severityInfo.icon className={`w-6 h-6 ${severityInfo.color}`} />
                 <h3 className="text-lg font-semibold text-foreground">
                   AI-Powered Analysis
                 </h3>
@@ -415,7 +426,6 @@ export default function IndustryView({
 
               {/* 2-Column Grid for Findings & Recommendations */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                {/* Key Findings */}
                 <div className="border rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <BarChart3 className="w-4 h-4 text-primary" />
@@ -423,10 +433,7 @@ export default function IndustryView({
                   </h4>
                   <ul className="space-y-2">
                     {analysisData.insights.key_findings.map((finding, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-muted-foreground flex items-start gap-2"
-                      >
+                      <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="text-primary mt-0.5">•</span>
                         <span>{finding}</span>
                       </li>
@@ -434,7 +441,6 @@ export default function IndustryView({
                   </ul>
                 </div>
 
-                {/* Recommendations */}
                 <div className="border rounded-lg p-4">
                   <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <FaPills className="w-4 h-4 text-primary" />
@@ -442,10 +448,7 @@ export default function IndustryView({
                   </h4>
                   <ul className="space-y-2">
                     {analysisData.insights.recommendations.map((rec, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-muted-foreground flex items-start gap-2"
-                      >
+                      <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">✓</span>
                         <span>{rec}</span>
                       </li>
@@ -454,79 +457,53 @@ export default function IndustryView({
                 </div>
               </div>
 
-              {/* Status Cards - 2-Column Grid */}
+              {/* Status Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
-                {/* Classification Card */}
                 <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
-                  <span className="text-xs text-muted-foreground">
-                    Classification
-                  </span>
+                  <span className="text-xs text-muted-foreground">Classification</span>
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        analysisData.analysis.predicted_class === "Critical"
-                          ? "bg-red-100 text-red-700"
-                          : analysisData.analysis.predicted_class === "Warning"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
-                      }`}
-                    >
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${analysisData.analysis.predicted_class === "Critical"
+                        ? "bg-red-100 text-red-700"
+                        : analysisData.analysis.predicted_class === "Warning"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                      }`}>
                       {analysisData.analysis.predicted_class}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {(analysisData.analysis.class_confidence * 100).toFixed(
-                        0,
-                      )}
-                      % conf.
+                      {(analysisData.analysis.class_confidence * 100).toFixed(0)}% conf.
                     </span>
                   </div>
                 </div>
 
-                {/* Anomaly Detection Card */}
                 <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
-                  <span className="text-xs text-muted-foreground">
-                    Anomaly Status
-                  </span>
+                  <span className="text-xs text-muted-foreground">Anomaly Status</span>
                   <div className="flex items-center gap-2">
-                    {getAnomalyIcon(
-                      analysisData.analysis.is_anomaly,
-                      analysisData.analysis.anomaly_score,
-                    )}
+                    {getAnomalyIcon(analysisData.analysis.is_anomaly, analysisData.analysis.anomaly_score)}
                     <span className="text-xs text-muted-foreground">
                       Score: {analysisData.analysis.anomaly_score.toFixed(2)}
                     </span>
                   </div>
                 </div>
 
-                {/* Violation Count Card */}
                 <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
-                  <span className="text-xs text-muted-foreground">
-                    Violations
-                  </span>
+                  <span className="text-xs text-muted-foreground">Violations</span>
                   <span className="text-sm font-semibold text-foreground">
                     {analysisData.analysis.violations?.length || 0} detected
                   </span>
                 </div>
 
-                {/* Confidence Card */}
                 <div className="flex items-center justify-between p-3 bg-muted/10 rounded-lg">
-                  <span className="text-xs text-muted-foreground">
-                    Analysis Confidence
-                  </span>
+                  <span className="text-xs text-muted-foreground">Analysis Confidence</span>
                   <div className="flex items-center gap-2">
                     <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full"
-                        style={{
-                          width: `${analysisData.analysis.class_confidence * 100}%`,
-                        }}
+                        style={{ width: `${analysisData.analysis.class_confidence * 100}%` }}
                       />
                     </div>
                     <span className="text-xs font-medium text-foreground">
-                      {(analysisData.analysis.class_confidence * 100).toFixed(
-                        0,
-                      )}
-                      %
+                      {(analysisData.analysis.class_confidence * 100).toFixed(0)}%
                     </span>
                   </div>
                 </div>
@@ -534,9 +511,9 @@ export default function IndustryView({
             </div>
           </Reveal>
         )}
-        {/* Main Content Grid - Challenges Only */}
+
+        {/* Challenges Panel */}
         <div className="grid lg:grid-cols-1 gap-6">
-          {/* Challenges Panel */}
           <Reveal delay={400}>
             <div className="border rounded-lg p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -545,19 +522,13 @@ export default function IndustryView({
               </div>
 
               <div className="space-y-1">
-                {selectedSubCategory.challenges &&
-                selectedSubCategory.challenges.length > 0 ? (
-                  selectedSubCategory.challenges.map(
-                    (challenge: string, i: number) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 p-3 rounded-lg transition-colors"
-                      >
-                        <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
-                        <p className="text-sm leading-relaxed">{challenge}</p>
-                      </div>
-                    ),
-                  )
+                {selectedSubCategory.challenges && selectedSubCategory.challenges.length > 0 ? (
+                  selectedSubCategory.challenges.map((challenge: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3 p-3 rounded-lg transition-colors">
+                      <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                      <p className="text-sm leading-relaxed">{challenge}</p>
+                    </div>
+                  ))
                 ) : (
                   <p className="text-sm italic text-center py-8">
                     No specific challenges documented for this sub-category yet.
