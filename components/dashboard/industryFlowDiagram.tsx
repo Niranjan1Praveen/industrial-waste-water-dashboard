@@ -74,6 +74,7 @@ export default function IndustryFlowDiagram({ industryId, subCategoryName }: Ind
         minZoom={0.5}
         maxZoom={1.5}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+        style={{ border: 'none' }}
       >
         <Background />
         <Controls />
