@@ -111,7 +111,7 @@ export interface AnalysisResult {
 export interface FlowDiagramData {
   nodes: Node[];
   edges: Edge[];
-  layout?: "vertical" | "horizontal";
+  layout?: "vertical" | "horizontal" | "custom";
   title?: string;
   description?: string;
 }
