@@ -11,6 +11,8 @@ export interface SubCategory {
   treatmentMethods?: string[];
   /** Future: typical parameter ranges for this sub-type */
   typicalParameters?: Partial<WaterParameters>;
+
+  typicalPreventiveParameters?: Partial<PreventiveParameters>; 
 }
 
 export interface Industry {
@@ -111,7 +113,38 @@ export interface AnalysisResult {
 export interface FlowDiagramData {
   nodes: Node[];
   edges: Edge[];
-  layout?: "vertical" | "horizontal";
+  layout?: "vertical" | "horizontal" | "custom";
   title?: string;
   description?: string;
+}
+
+// --------------------------------------------------------
+// Preventive Maintenance Parameters (Equipment Health)
+// --------------------------------------------------------
+
+export type EquipmentType = "Pump" | "Blower";
+export type HealthStatus = "Healthy" | "Warning" | "Critical";
+
+export interface PreventiveParameters {
+  sound: number;       // Acoustic Emissions (dB)
+  vibration: number;   // Vibration Velocity (mm/s)
+  temperature: number; // Casing/Bearing Temperature (°C)
+}
+
+export interface EquipmentNode {
+  id: string;
+  name: string;
+  type: EquipmentType;
+  location?: string;
+  status: HealthStatus;
+  parameters: PreventiveParameters;
+}
+
+export interface PreventiveAnalysisResult {
+  mode: "collective" | "individual";
+  targetId?: string; // If individual, which equipment
+  healthSummary: HealthStatus;
+  anomalyScore: number;
+  recommendations: string[];
+  timestamp: string;
 }
