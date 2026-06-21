@@ -18,6 +18,8 @@ import Reveal from "@/components/reveal";
 import dynamic from "next/dynamic";
 import { FaPills } from "react-icons/fa";
 import ParameterCustomizer from "@/components/dashboard/parameterCustomizer";
+import PreventiveCustomizer from "@/components/dashboard/preventiveCustomizer";
+import { Activity, Thermometer, Waves } from "lucide-react";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://heepl-ai-agents.onrender.com";
@@ -54,7 +56,7 @@ const IndustryFlowDiagram = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[500px] border border-border rounded-lg flex items-center justify-center">
+      <div className="w-full h-125 border border-border rounded-lg flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">
           Loading flow diagram...
         </div>
@@ -64,6 +66,8 @@ const IndustryFlowDiagram = dynamic(
 );
 
 export default function IndustryView({ selectedSubCategory }: IndustryViewProps) {
+  const [viewMode, setViewMode] = useState<"qualitative" | "preventive">("qualitative");
+  const [preventiveData, setPreventiveData] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
@@ -104,12 +108,21 @@ export default function IndustryView({ selectedSubCategory }: IndustryViewProps)
   }, [selectedSubCategory]);
 
   // Reset analysis when industry changes
+// Reset EVERYTHING (including slider parameters) when the actual industry changes
   useEffect(() => {
     setAnalysisData(null);
+    setPreventiveData(null);
     setUserParameters(null);
     setError(null);
   }, [selectedSubCategory.id]);
 
+  // ONLY clear the AI analysis card and errors when switching between Qualitative/Preventive views
+  useEffect(() => {
+    setAnalysisData(null);
+    setPreventiveData(null);
+    setError(null);
+  }, [viewMode]);
+  
   const handleAnalyze = async (parameters: {
     bod: number;
     cod: number;
@@ -252,22 +265,47 @@ export default function IndustryView({ selectedSubCategory }: IndustryViewProps)
 
   // Get the parameters to display in metrics (user values or default)
   const displayParameters = userParameters || defaultParameters;
-
-  return (
+return (
     <div className="section min-h-screen">
       {/* Dashboard Header */}
       <div className="border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-wrap justify-between items-start gap-4">
             <div>
-              <h1
-                className="font-playfair font-black leading-[0.95] tracking-[-0.03em] mb-2"
-                style={{ fontSize: "clamp(32px, 5vw, 42px)" }}
-              >
-                {selectedSubCategory.name}
-              </h1>
-              <p className="text-sm uppercase tracking-wide font-semibold">
-                Effluent Profile Analysis
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-2">
+                <h1
+                  className="font-playfair font-black leading-[0.95] tracking-[-0.03em]"
+                  style={{ fontSize: "clamp(32px, 5vw, 42px)" }}
+                >
+                  {selectedSubCategory.name}
+                </h1>
+                
+                {/* Section Toggle Button */}
+                <div className="flex bg-muted/50 p-1 rounded-lg border">
+                  <button
+                    onClick={() => setViewMode("qualitative")}
+                    className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+                      viewMode === "qualitative"
+                        ? "bg-background shadow-sm font-semibold text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Qualitative
+                  </button>
+                  <button
+                    onClick={() => setViewMode("preventive")}
+                    className={`px-4 py-1.5 text-sm rounded-md transition-all ${
+                      viewMode === "preventive"
+                        ? "bg-background shadow-sm font-semibold text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    Preventive
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm uppercase tracking-wide font-semibold text-muted-foreground">
+                {viewMode === "qualitative" ? "Effluent Profile Analysis" : "Equipment Health Monitoring"}
               </p>
             </div>
             <div className="flex gap-2 items-center flex-wrap">
@@ -299,88 +337,231 @@ export default function IndustryView({ selectedSubCategory }: IndustryViewProps)
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="border rounded-lg p-4">
-            <Heart className="w-6 h-6 text-red-500 mb-2" />
-            <p className="text-xs text-muted-foreground mb-1">BOD Level</p>
-            <p className="text-xl font-bold text-foreground">
-              {displayParameters.bod.toLocaleString()}{" "}
-              <span className="text-sm">mg/L</span>
-            </p>
-            {selectedSubCategory.typicalValues?.bod && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Typical: {selectedSubCategory.typicalValues.bod.toLocaleString()} mg/L
-              </p>
-            )}
-          </div>
+        
+        {/* Toggleable Views */}
+        {viewMode === "qualitative" ? (
+          <>
+            {/* Key Metrics Grid - QUALITATIVE */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="border rounded-lg p-4">
+                <Heart className="w-6 h-6 text-red-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">BOD Level</p>
+                <p className="text-xl font-bold text-foreground">
+                  {displayParameters.bod.toLocaleString()} <span className="text-sm">mg/L</span>
+                </p>
+                {selectedSubCategory.typicalValues?.bod && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Typical: {selectedSubCategory.typicalValues.bod.toLocaleString()} mg/L
+                  </p>
+                )}
+              </div>
 
-          <div className="border rounded-lg p-4">
-            <BarChart3 className="w-6 h-6 text-blue-500 mb-2" />
-            <p className="text-xs text-muted-foreground mb-1">COD Level</p>
-            <p className="text-xl font-bold text-foreground">
-              {displayParameters.cod.toLocaleString()}{" "}
-              <span className="text-sm">mg/L</span>
-            </p>
-            {selectedSubCategory.typicalValues?.cod && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Typical: {selectedSubCategory.typicalValues.cod.toLocaleString()} mg/L
-              </p>
-            )}
-          </div>
+              <div className="border rounded-lg p-4">
+                <BarChart3 className="w-6 h-6 text-blue-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">COD Level</p>
+                <p className="text-xl font-bold text-foreground">
+                  {displayParameters.cod.toLocaleString()} <span className="text-sm">mg/L</span>
+                </p>
+                {selectedSubCategory.typicalValues?.cod && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Typical: {selectedSubCategory.typicalValues.cod.toLocaleString()} mg/L
+                  </p>
+                )}
+              </div>
 
-          <div className="border rounded-lg p-4">
-            <Trophy className="w-6 h-6 text-amber-500 mb-2" />
-            <p className="text-xs text-muted-foreground mb-1">TSS Level</p>
-            <p className="text-xl font-bold text-foreground">
-              {displayParameters.tss.toLocaleString()}{" "}
-              <span className="text-sm">mg/L</span>
-            </p>
-            {selectedSubCategory.typicalValues?.tss && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Typical: {selectedSubCategory.typicalValues.tss.toLocaleString()} mg/L
-              </p>
-            )}
-          </div>
+              <div className="border rounded-lg p-4">
+                <Trophy className="w-6 h-6 text-amber-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">TSS Level</p>
+                <p className="text-xl font-bold text-foreground">
+                  {displayParameters.tss.toLocaleString()} <span className="text-sm">mg/L</span>
+                </p>
+                {selectedSubCategory.typicalValues?.tss && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Typical: {selectedSubCategory.typicalValues.tss.toLocaleString()} mg/L
+                  </p>
+                )}
+              </div>
 
-          <div className="border rounded-lg p-4">
-            <Calendar className="w-6 h-6 text-green-500 mb-2" />
-            <p className="text-xs text-muted-foreground mb-1">pH Level</p>
-            <p className="text-xl font-bold text-foreground">
-              {displayParameters.ph}{" "}
-              <span className="text-sm">pH</span>
-            </p>
-            {selectedSubCategory.typicalValues?.ph && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Typical: {selectedSubCategory.typicalValues.ph}
-              </p>
-            )}
-          </div>
-        </div>
+              <div className="border rounded-lg p-4">
+                <Calendar className="w-6 h-6 text-green-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">pH Level</p>
+                <p className="text-xl font-bold text-foreground">
+                  {displayParameters.ph} <span className="text-sm">pH</span>
+                </p>
+                {selectedSubCategory.typicalValues?.ph && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Typical: {selectedSubCategory.typicalValues.ph}
+                  </p>
+                )}
+              </div>
+            </div>
 
-        {/* Process Flow Diagram - Interactive */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            Process Flow Diagram
-          </h3>
-          <IndustryFlowDiagram
-            industryId={selectedSubCategory.id}
-            subCategoryName={selectedSubCategory.name}
-          />
-        </div>
+            {/* Process Flow Diagram - Interactive */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Process Flow Diagram
+              </h3>
+              <IndustryFlowDiagram
+                industryId={selectedSubCategory.id}
+                subCategoryName={selectedSubCategory.name}
+              />
+            </div>
 
-        {/* Parameter Customizer - BELOW Flow Diagram */}
-        <div className="mb-8">
-          <ParameterCustomizer
-            industryId={selectedSubCategory.id}
-            industryName={selectedSubCategory.name}
-            defaultValues={defaultParameters}
-            onAnalyze={handleAnalyze}
-            isAnalyzing={isAnalyzing}
-          />
-        </div>
+            {/* Parameter Customizer */}
+            <div className="mb-8">
+              <ParameterCustomizer
+                industryId={selectedSubCategory.id}
+                industryName={selectedSubCategory.name}
+                defaultValues={defaultParameters}
+                onAnalyze={handleAnalyze}
+                isAnalyzing={isAnalyzing}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Key Metrics Grid - PREVENTIVE */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="border rounded-lg p-4 bg-muted/10">
+                <Activity className="w-6 h-6 text-purple-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">Standard Sound Level</p>
+                <p className="text-xl font-bold text-foreground">
+                  75.0 <span className="text-sm">dB</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1">Normal Range: &lt; 85 dB</p>
+              </div>
+              <div className="border rounded-lg p-4 bg-muted/10">
+                <Waves className="w-6 h-6 text-cyan-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">Base Vibration</p>
+                <p className="text-xl font-bold text-foreground">
+                  2.5 <span className="text-sm">mm/s</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1">Normal Range: &lt; 4.5 mm/s</p>
+              </div>
+              <div className="border rounded-lg p-4 bg-muted/10">
+                <Thermometer className="w-6 h-6 text-orange-500 mb-2" />
+                <p className="text-xs text-muted-foreground mb-1">Operating Temp</p>
+                <p className="text-xl font-bold text-foreground">
+                  45.0 <span className="text-sm">°C</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1">Normal Range: &lt; 70 °C</p>
+              </div>
+            </div>
 
+            {/* Preventive Customizer */}
+            <div className="mb-8">
+              <PreventiveCustomizer
+                industryId={selectedSubCategory.id}
+                industryName={selectedSubCategory.name}
+                onAnalyze={(mode, data) => {
+                  setIsAnalyzing(true);
+                  setPreventiveData(null);
+                  
+                  // Mocking the future AI Backend delay
+                  setTimeout(() => {
+                    setIsAnalyzing(false);
+                    if (mode === "collective") {
+                      setPreventiveData({
+                        mode: "collective",
+                        status: "Warning",
+                        summary: "Fleet analysis complete. Detected anomalies in 2 out of 12 units. Immediate attention recommended to prevent system downtime.",
+                        issues: [
+                          { name: "Feed Pump 4", details: "Elevated temperature (75°C) and vibration (5.2 mm/s)." },
+                          { name: "Feed Pump 7", details: "Critical acoustic emissions (95 dB) and severe vibration (8.5 mm/s)." }
+                        ],
+                        recommendations: [
+                          "Schedule emergency maintenance for Feed Pump 7 bearings.",
+                          "Monitor cooling flow to Feed Pump 4.",
+                          "Ensure Blower 2 is ready to handle load shifts."
+                        ]
+                      });
+                    } else {
+                      setPreventiveData({
+                        mode: "individual",
+                        target: data.name,
+                        status: data.status,
+                        summary: `Diagnostic scan complete for ${data.name}.`,
+                        readings: `Sound: ${data.parameters.sound}dB | Vibration: ${data.parameters.vibration}mm/s | Temp: ${data.parameters.temperature}°C`,
+                        recommendations: data.status === "Healthy"
+                          ? ["Unit operating within optimal parameters.", "Continue standard weekly monitoring."]
+                          : ["Inspect impeller for cavitation damage.", "Check bearing lubrication levels immediately."]
+                      });
+                    }
+                  }, 1500);
+                }}
+                isAnalyzing={isAnalyzing}
+              />
+            </div>
+          </>
+        )}
+        {/* PREVENTIVE Insights Section (Mock UI) */}
+        {preventiveData && !isAnalyzing && viewMode === "preventive" && (
+          <Reveal delay={0}>
+            <div className="mb-8 p-6 rounded-lg border bg-card">
+              <div className="flex items-center gap-3 mb-6 pb-3 border-b">
+                {preventiveData.status === "Healthy" ? (
+                  <CheckCircle2 className="w-6 h-6 text-green-500" />
+                ) : (
+                  <AlertTriangle className="w-6 h-6 text-yellow-500" />
+                )}
+                <h3 className="text-lg font-semibold text-foreground">
+                  {preventiveData.mode === "collective" ? "Fleet Diagnostic Report" : `Diagnostic Report: ${preventiveData.target}`}
+                </h3>
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  preventiveData.status === "Healthy" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                }`}>
+                  {preventiveData.status}
+                </span>
+              </div>
+
+              <div className="mb-6 p-4 bg-muted/20 rounded-lg">
+                <p className="text-sm text-foreground leading-relaxed font-medium">
+                  {preventiveData.summary}
+                </p>
+                {preventiveData.readings && (
+                  <p className="text-sm text-muted-foreground mt-2 font-mono bg-background p-2 rounded inline-block border">
+                    {preventiveData.readings}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {preventiveData.issues && (
+                  <div className="border rounded-lg p-4 bg-red-50/50 border-red-100">
+                    <h4 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      Detected Anomalies
+                    </h4>
+                    <ul className="space-y-3">
+                      {preventiveData.issues.map((issue: any, idx: number) => (
+                        <li key={idx} className="text-sm">
+                          <span className="font-bold text-red-700">{issue.name}:</span>
+                          <span className="text-red-600/80 ml-1">{issue.details}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className={`border rounded-lg p-4 ${!preventiveData.issues ? 'lg:col-span-2' : ''}`}>
+                  <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <FaPills className="w-4 h-4 text-primary" />
+                    Maintenance Recommendations
+                  </h4>
+                  <ul className="space-y-2">
+                    {preventiveData.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <span className="text-primary mt-0.5">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        )}
         {/* AI Analysis Loading/Error State */}
         {isAnalyzing && (
           <div className="mb-8 p-6 rounded-lg border bg-muted/20 flex items-center justify-center gap-3">
