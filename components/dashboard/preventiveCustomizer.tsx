@@ -36,17 +36,41 @@ const generateInitialEquipment = (): EquipmentNode[] => {
 interface PreventiveCustomizerProps {
   industryId: string;
   industryName: string;
+  initialEquipment?: any[];
   onAnalyze: (mode: "collective" | "individual", data: any) => void;
   isAnalyzing?: boolean;
 }
 
+function rosterToEquipmentNodes(roster: any[]): EquipmentNode[] {
+  return roster.map((eq) => ({
+    id: eq.id,
+    name: eq.name,
+    type: eq.type as "Pump" | "Blower",
+    location: eq.location,
+    status: "Healthy" as const,
+    parameters: eq.default_parameters ?? { sound: 72, vibration: 2.1, temperature: 48 },
+  }));
+}
+
 export default function PreventiveCustomizer({
+  initialEquipment,
   onAnalyze,
   isAnalyzing = false,
 }: PreventiveCustomizerProps) {
-  const [equipmentList, setEquipmentList] = useState<EquipmentNode[]>(generateInitialEquipment());
+  const [equipmentList, setEquipmentList] = useState<EquipmentNode[]>(
+    initialEquipment ? rosterToEquipmentNodes(initialEquipment) : generateInitialEquipment()
+  );
   const [selectedEqId, setSelectedEqId] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // When the API roster arrives (after initial render), seed the equipment list
+  React.useEffect(() => {
+    if (initialEquipment) {
+      setEquipmentList(rosterToEquipmentNodes(initialEquipment));
+      setSelectedEqId(null);
+      setHasChanges(false);
+    }
+  }, [initialEquipment]);
 
   // Get the currently selected equipment object
   const selectedEq = equipmentList.find((eq) => eq.id === selectedEqId);
@@ -64,7 +88,8 @@ export default function PreventiveCustomizer({
   };
 
   const handleReset = () => {
-    setEquipmentList(generateInitialEquipment());
+    setEquipmentList(initialEquipment ? rosterToEquipmentNodes(initialEquipment) : generateInitialEquipment());
+    setSelectedEqId(null);
     setHasChanges(false);
   };
 

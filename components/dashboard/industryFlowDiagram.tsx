@@ -36,15 +36,39 @@ const getDefaultFlowData = (): FlowDiagramData => ({
   title: 'General Process Flow',
 });
 
+// Convert "border" shorthand to separate longhands so React doesn't warn about
+// mixing shorthand + borderColor (which ReactFlow sets internally).
+const expandBorder = (style: Record<string, any> = {}): Record<string, any> => {
+  if (!style.border) return style;
+  const { border, ...rest } = style;
+  const parts = (border as string).trim().split(/\s+/);
+  return {
+    ...rest,
+    borderWidth: parts[0] ?? '1px',
+    borderStyle: parts[1] ?? 'solid',
+    borderColor: parts.slice(2).join(' ') || '#000',
+  };
+};
+
+// Spread node positions to increase inter-node gaps.
+// Node widths are fixed in CSS; multiplying positions by k scales gaps by more than k
+// (gap_new = k*gap + (k-1)*nodeWidth), giving visibly larger clearance even after fitView.
+const spreadNodes = (nodes: any[], kx = 1.55, ky = 1.45) =>
+  nodes.map((n) => ({
+    ...n,
+    position: { x: n.position.x * kx, y: n.position.y * ky },
+    style: expandBorder(n.style),
+  }));
+
 export default function IndustryFlowDiagram({ industryId, subCategoryName }: IndustryFlowDiagramProps) {
   const flowData =
   flowDiagramsData[industryId] || getDefaultFlowData();
-  const [nodes, setNodes, onNodesChange] = useNodesState(flowData.nodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(spreadNodes(flowData.nodes));
   const [edges, setEdges, onEdgesChange] = useEdgesState(flowData.edges);
 
   // Load flow diagram data when industry changes
   useEffect(() => {
-  setNodes(flowData.nodes);
+  setNodes(spreadNodes(flowData.nodes));
   setEdges(flowData.edges);
 }, [industryId]);
 
@@ -62,7 +86,7 @@ export default function IndustryFlowDiagram({ industryId, subCategoryName }: Ind
   }
 
   return (
-    <div className="w-full h-[600px] border border-border rounded-lg bg-card overflow-hidden">
+    <div className="w-full h-[700px] border border-border rounded-lg bg-card overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -70,10 +94,10 @@ export default function IndustryFlowDiagram({ industryId, subCategoryName }: Ind
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
+        fitViewOptions={{ padding: 0.18 }}
         attributionPosition="bottom-left"
-        minZoom={0.5}
+        minZoom={0.3}
         maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
         style={{ border: 'none' }}
       >
         <Background />

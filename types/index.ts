@@ -92,6 +92,17 @@ export interface RiskPrediction {
   recommendedActions: string[];
 }
 
+export interface ParameterTreatment {
+  parameter: string;
+  current_value: number;
+  issue: string;
+  chemical: string;
+  dosage: string;
+  process: string;
+  expected_outcome: string;
+  cost_band: "Low" | "Medium" | "High";
+}
+
 export interface TreatmentRecommendation {
   id: string;
   name: string;
