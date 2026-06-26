@@ -2,13 +2,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-type SubCategory = {
-  id: string;
-  name: string;
-  challenges: string[];
-  // ... other properties
-};
-
 type Parameters = {
   bod: number;
   cod: number;
@@ -18,8 +11,6 @@ type Parameters = {
 };
 
 type DashboardContextType = {
-  selectedSubCategory: SubCategory | null;
-  setSelectedSubCategory: (category: SubCategory | null) => void;
   parameters: Parameters;
   handleParameterChange: (key: keyof Parameters, value: number) => void;
 };
@@ -27,7 +18,6 @@ type DashboardContextType = {
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
-  const [selectedSubCategory, setSelectedSubCategory] = useState<SubCategory | null>(null);
   const [parameters, setParameters] = useState<Parameters>({
     bod: 500,
     cod: 1000,
@@ -41,14 +31,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <DashboardContext.Provider
-      value={{
-        selectedSubCategory,
-        setSelectedSubCategory,
-        parameters,
-        handleParameterChange,
-      }}
-    >
+    <DashboardContext.Provider value={{ parameters, handleParameterChange }}>
       {children}
     </DashboardContext.Provider>
   );

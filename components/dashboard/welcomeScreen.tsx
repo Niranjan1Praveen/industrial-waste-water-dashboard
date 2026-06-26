@@ -7,18 +7,21 @@ import {
   Heart,
   BarChart3,
   CheckCircle2,
-  ArrowRight,
   Factory,
   Droplets,
   FileDown,
   Settings,
+  Activity,
+  Brain,
+  Gauge,
+  Zap,
 } from "lucide-react";
 
 export default function WelcomeScreen() {
   const { user } = useUser();
 
   const industriesCount = 17;
-  const subCategoriesCount = 50;
+  const subCategoriesCount = 60;
   const dataPointsCount = 500;
 
   return (
@@ -33,13 +36,15 @@ export default function WelcomeScreen() {
             Effluent Analysis Dashboard
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Industrial wastewater treatment & parameter optimization
+            Industrial wastewater analysis, CPCB/EPA compliance monitoring, and
+            AI-powered equipment health management across 17+ industry sectors
           </p>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         {/* Welcome & Profile Card */}
         <Reveal>
           <div className="border border-border rounded-lg p-6 mb-8 bg-gradient-to-r from-primary/5 to-transparent">
@@ -50,12 +55,14 @@ export default function WelcomeScreen() {
                   {user?.fullName || user?.username || "Professional"}!
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Your industrial wastewater analysis platform. Select an
-                  industry sector from the left panel to begin effluent
-                  parameter analysis.
+                  Select an industry sector from the left panel to begin. Use the{" "}
+                  <span className="text-foreground font-medium">Qualitative</span> tab for
+                  effluent parameter analysis and AI treatment recommendations, or the{" "}
+                  <span className="text-foreground font-medium">Preventive</span> tab for
+                  equipment health monitoring and maintenance prescriptions.
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <div className="text-3xl font-bold text-primary">Ready</div>
                 <p className="text-xs text-muted-foreground">System Online</p>
               </div>
@@ -68,145 +75,157 @@ export default function WelcomeScreen() {
           <Reveal delay={80}>
             <div className="border border-border rounded-lg p-4 h-full">
               <Factory className="w-6 h-6 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">
-                Industries Covered
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {industriesCount}+
-              </p>
+              <p className="text-xs text-muted-foreground mb-1">Industries Covered</p>
+              <p className="text-xl font-bold text-foreground">{industriesCount}+</p>
             </div>
           </Reveal>
 
           <Reveal delay={160}>
             <div className="border border-border rounded-lg p-4 h-full">
               <Droplets className="w-6 h-6 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">
-                Sub-Categories
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                {subCategoriesCount}+
-              </p>
+              <p className="text-xs text-muted-foreground mb-1">Sub-Categories</p>
+              <p className="text-xl font-bold text-foreground">{subCategoriesCount}+</p>
             </div>
           </Reveal>
 
           <Reveal delay={240}>
             <div className="border border-border rounded-lg p-4 h-full">
               <BarChart3 className="w-6 h-6 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">Data Points</p>
-              <p className="text-xl font-bold text-foreground">
-                {dataPointsCount}+
-              </p>
+              <p className="text-xs text-muted-foreground mb-1">Effluent Data Points</p>
+              <p className="text-xl font-bold text-foreground">{dataPointsCount}+</p>
             </div>
           </Reveal>
 
           <Reveal delay={320}>
             <div className="border border-border rounded-lg p-4 h-full">
-              <FileDown className="w-6 h-6 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">
-                Downloadable Reports
-              </p>
-              <p className="text-xl font-bold text-foreground">
-                CSV & Diagrams
-              </p>
+              <Activity className="w-6 h-6 text-primary mb-2" />
+              <p className="text-xs text-muted-foreground mb-1">Equipment Monitored</p>
+              <p className="text-xl font-bold text-foreground">Pump & Blower</p>
             </div>
           </Reveal>
         </div>
 
-        {/* Action Panels */}
+        {/* Two Tabs Explained */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Get Started Panel */}
+
+          {/* Qualitative Tab */}
           <Reveal delay={400}>
             <div className="border border-border rounded-lg p-6 h-full">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground mb-1">
-                    Get Started
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Begin your analysis journey
-                  </p>
+                  <h3 className="text-lg font-bold text-foreground mb-1">Qualitative Tab</h3>
+                  <p className="text-xs text-muted-foreground">Effluent parameter analysis & AI insights</p>
                 </div>
-                <Heart className="w-6 h-6 text-primary" />
+                <Brain className="w-6 h-6 text-primary shrink-0" />
               </div>
-              <div className="space-y-3 mb-5">
+              <div className="space-y-2 mb-4">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-muted-foreground">Step 1</span>
+                  <span className="text-xs text-muted-foreground">Step 1</span>
                   <hr className="flex-1 mx-2 border-t border-border" />
-                  <span className="text-sm text-foreground">
-                    Select an industry
-                  </span>
+                  <span className="text-xs text-foreground">Select industry & sub-category</span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-muted-foreground">Step 2</span>
+                  <span className="text-xs text-muted-foreground">Step 2</span>
                   <hr className="flex-1 mx-2 border-t border-border" />
-                  <span className="text-sm text-foreground">
-                    Choose sub-category
-                  </span>
+                  <span className="text-xs text-foreground">Adjust BOD / COD / TSS / TDS / pH sliders</span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-muted-foreground">Step 3</span>
+                  <span className="text-xs text-muted-foreground">Step 3</span>
                   <hr className="flex-1 mx-2 border-t border-border" />
-                  <span className="text-sm text-foreground">
-                    View & analyze data
-                  </span>
+                  <span className="text-xs text-foreground">Click Analyze Parameters</span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Step 4</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
+                  <span className="text-xs text-foreground">Review violations & treatment remedies</span>
+                </div>
+              </div>
+              <div className="space-y-2 pt-3 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Anomaly detection (IsolationForest)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Effluent pattern classification (RandomForest)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Gemini AI treatment recommendations</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">CPCB / EPA compliance violation flags</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Interactive process flow diagram (PFD)</span>
                 </div>
               </div>
             </div>
           </Reveal>
 
-          {/* Features Panel */}
+          {/* Preventive Tab */}
           <Reveal delay={480}>
             <div className="border border-border rounded-lg p-6 h-full">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground mb-1">
-                    Key Features
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    What you can do
-                  </p>
+                  <h3 className="text-lg font-bold text-foreground mb-1">Preventive Tab</h3>
+                  <p className="text-xs text-muted-foreground">Equipment health monitoring & AI prescriptions</p>
                 </div>
-                <Settings className="w-6 h-6 text-primary" />
+                <Activity className="w-6 h-6 text-primary shrink-0" />
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-foreground">
-                    View effluent parameters (BOD, COD, TSS, TDS, pH)
-                  </span>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Step 1</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
+                  <span className="text-xs text-foreground">Select industry — roster loads automatically</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-foreground">
-                    Download water quality CSV data
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Step 2</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
+                  <span className="text-xs text-foreground">Click a unit to adjust sound / vibration / temp</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-foreground">
-                    View process flow diagrams
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Step 3</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
+                  <span className="text-xs text-foreground">Run Fleet Analysis or Analyze individually</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-foreground">
-                    Analyze treatment challenges
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">Step 4</span>
+                  <hr className="flex-1 mx-2 border-t border-border" />
+                  <span className="text-xs text-foreground">Review maintenance actions & unit health table</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-foreground">
-                    Export analysis reports
-                  </span>
+              </div>
+              <div className="space-y-2 pt-3 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">ISO 10816 threshold checks (sound, vibration, temp)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">IsolationForest anomaly scoring per unit</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Gemini AI maintenance prescriptions</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Industry-specific equipment rosters</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                  <span className="text-xs text-foreground">Fleet-wide health summary & shutdown risk</span>
                 </div>
               </div>
             </div>
           </Reveal>
         </div>
 
-        {/* Recent Updates & Quick Tips */}
+        {/* Featured Industries + Quick Tips */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Featured Industries */}
+
           <Reveal delay={560}>
             <div className="border border-border rounded-lg p-6 h-full">
               <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
@@ -214,72 +233,65 @@ export default function WelcomeScreen() {
                 Featured Industries
               </h3>
               <div className="space-y-3">
-                <div className="pl-3 py-2">
-                  <p className="text-sm font-medium text-foreground">
-                    Pharmaceutical Industry
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    API Bulk Drugs, Formulation, Biologics, R&D Labs
-                  </p>
+                <div className="pl-3 py-2 border-l-2 border-primary/30">
+                  <p className="text-sm font-medium text-foreground">Pharmaceutical Industry</p>
+                  <p className="text-xs text-muted-foreground">API Bulk Drugs, Formulation, Biologics, R&D Labs</p>
                 </div>
-                <div className="pl-3 py-2">
-                  <p className="text-sm font-medium text-foreground">
-                    Textile & Dyeing
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    5 sub-categories including Cotton, Synthetic, Denim
-                  </p>
+                <div className="pl-3 py-2 border-l-2 border-primary/30">
+                  <p className="text-sm font-medium text-foreground">Distillery & Fermentation</p>
+                  <p className="text-xs text-muted-foreground">Molasses, Grain, Winery — includes ZLD process flow diagrams</p>
                 </div>
-                <div className="pl-3 py-2">
-                  <p className="text-sm font-medium text-foreground">
-                    Dairy & Food Processing
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Comprehensive CSV data available for download
-                  </p>
+                <div className="pl-3 py-2 border-l-2 border-primary/30">
+                  <p className="text-sm font-medium text-foreground">Textile & Dyeing</p>
+                  <p className="text-xs text-muted-foreground">Cotton, Synthetic, Denim — high COD & colour removal focus</p>
+                </div>
+                <div className="pl-3 py-2 border-l-2 border-primary/30">
+                  <p className="text-sm font-medium text-foreground">Pulp & Paper Mills</p>
+                  <p className="text-xs text-muted-foreground">Chemical Pulping, Bleaching — equipment roster includes gas blowers</p>
                 </div>
               </div>
             </div>
           </Reveal>
 
-          {/* Quick Tips */}
           <Reveal delay={640}>
             <div className="border border-border rounded-lg p-6 h-full">
-              <h3 className="text-lg font-bold text-foreground mb-4">
+              <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                <Settings className="w-5 h-5 text-primary" />
                 Quick Tips
               </h3>
               <div className="space-y-3">
                 <div className="pl-3 bg-primary/5 rounded-lg py-2">
                   <p className="text-sm font-medium text-foreground mb-1">
-                    Parameter Adjustment
+                    <Zap className="w-3 h-3 inline mr-1 text-primary" />
+                    Parameter Sliders
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Use the sliders to modify BOD, COD, TSS, TDS, and pH values
-                    to see how treatment recommendations change.
+                    Slider bounds auto-scale to 3× the industry typical value — making it easy to test extreme effluent scenarios.
                   </p>
                 </div>
                 <div className="pl-3 bg-primary/5 rounded-lg py-2">
                   <p className="text-sm font-medium text-foreground mb-1">
+                    <Gauge className="w-3 h-3 inline mr-1 text-primary" />
+                    Equipment Drill-Down
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Click any unit in the fleet grid to open its individual sensor sliders. Use "Analyze This Unit" for a focused diagnosis.
+                  </p>
+                </div>
+                <div className="pl-3 bg-primary/5 rounded-lg py-2">
+                  <p className="text-sm font-medium text-foreground mb-1">
+                    <FileDown className="w-3 h-3 inline mr-1 text-primary" />
                     Data Export
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Download CSV files containing real water quality data for
-                    each industry sub-category.
-                  </p>
-                </div>
-                <div className="pl-3 bg-primary/5 rounded-lg py-2">
-                  <p className="text-sm font-medium text-foreground mb-1">
-                    Treatment Challenges
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Each industry has specific treatment challenges. Review them
-                    to understand key pain points.
+                    Download industry CSV files with real historical effluent data directly from the Qualitative tab header.
                   </p>
                 </div>
               </div>
             </div>
           </Reveal>
         </div>
+
       </div>
     </div>
   );

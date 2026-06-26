@@ -20,7 +20,6 @@ import {
   FaBox,
   FaAppleAlt,
   FaBatteryFull,
-  FaAccessibleIcon,
   FaHome,
 } from "react-icons/fa";
 import ImageNext from "next/image";
@@ -38,11 +37,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useDashboard } from "@/contexts/DashboardContext";
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-// Map industry IDs to their respective icons from react-icons
 const industryIcons: Record<string, React.ElementType> = {
   pharma: FaFlask,
   distillery: FaWineBottle,
@@ -64,29 +62,35 @@ const industryIcons: Record<string, React.ElementType> = {
 };
 
 export default function AppSidebar() {
-  const { setSelectedSubCategory } = useDashboard();
-  // Change from string | null to Set or array for multiple expanded items
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
   const { user, isLoaded } = useUser();
   const { state, setOpen } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const pathname = usePathname();
+
+  // Auto-expand the industry whose sub-category matches the current URL
+  React.useEffect(() => {
+    const matched = industries.find((i) =>
+      i.subCategories.some((s) => pathname === `/dashboard/${i.id}/${s.id}`)
+    );
+    if (matched) {
+      setExpandedIds((prev) => new Set([...prev, matched.id]));
+    }
+  }, [pathname]);
 
   const handleMenuClick = (industryId: string) => {
-    // If sidebar is collapsed, expand it first
     if (isCollapsed) {
       setOpen(true);
-      // Store the industry ID to expand after sidebar opens
       setExpandedIds(new Set([industryId]));
     } else {
-      // Toggle the submenu without closing others
       setExpandedIds((prev) => {
-        const newSet = new Set(prev);
-        if (newSet.has(industryId)) {
-          newSet.delete(industryId); // Close if already open
+        const next = new Set(prev);
+        if (next.has(industryId)) {
+          next.delete(industryId);
         } else {
-          newSet.add(industryId); // Open without closing others
+          next.add(industryId);
         }
-        return newSet;
+        return next;
       });
     }
   };
@@ -114,6 +118,7 @@ export default function AppSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
+                {/* Overview link */}
                 <Link href="/dashboard/overview" className="block">
                   <SidebarMenuItem>
                     <SidebarMenuButton
@@ -127,10 +132,11 @@ export default function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
+
+                {/* Industry accordion */}
                 {industries.map((industry) => {
                   const isExpanded = expandedIds.has(industry.id);
-                  const IconComponent =
-                    industryIcons[industry.id] || FaIndustry;
+                  const IconComponent = industryIcons[industry.id] || FaIndustry;
 
                   return (
                     <SidebarMenuItem key={industry.id}>
@@ -141,9 +147,7 @@ export default function AppSidebar() {
                       >
                         <div className="flex items-center gap-3">
                           <IconComponent className="h-4 w-4 shrink-0" />
-                          <Link href={`/dashboard`}>
-                            <span className="truncate">{industry.name}</span>
-                          </Link>
+                          <span className="truncate">{industry.name}</span>
                         </div>
                         {!isCollapsed &&
                           (isExpanded ? (
@@ -156,21 +160,25 @@ export default function AppSidebar() {
                       {!isCollapsed && isExpanded && (
                         <div className="ml-4 mt-1 border-l pl-2">
                           <SidebarMenu className="gap-1">
-                            {industry.subCategories.map((sub) => (
-                              <SidebarMenuItem key={sub.id}>
-                                <Link
-                                  onClick={() => setSelectedSubCategory(sub)}
-                                  href={`/dashboard`}
-                                  className="
-                                    flex w-full items-center rounded-md px-2 py-2
-                                    text-left text-sm transition-colors
-                                    hover:bg-accent hover:text-accent-foreground
-                                  "
-                                >
-                                  {sub.name}
-                                </Link>
-                              </SidebarMenuItem>
-                            ))}
+                            {industry.subCategories.map((sub) => {
+                              const href = `/dashboard/${industry.id}/${sub.id}`;
+                              const isActive = pathname === href;
+                              return (
+                                <SidebarMenuItem key={sub.id}>
+                                  <Link
+                                    href={href}
+                                    className={`
+                                      flex w-full items-center rounded-md px-2 py-2
+                                      text-left text-sm transition-colors
+                                      hover:bg-accent hover:text-accent-foreground
+                                      ${isActive ? "bg-accent text-accent-foreground font-medium" : ""}
+                                    `}
+                                  >
+                                    {sub.name}
+                                  </Link>
+                                </SidebarMenuItem>
+                              );
+                            })}
                           </SidebarMenu>
                         </div>
                       )}
