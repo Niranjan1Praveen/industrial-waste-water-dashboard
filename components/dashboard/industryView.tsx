@@ -24,8 +24,8 @@ import ParameterCustomizer from "@/components/dashboard/parameterCustomizer";
 import { ParameterTreatment } from "@/types";
 import PreventiveCustomizer from "@/components/dashboard/preventiveCustomizer";
 import { Activity, Thermometer, Waves } from "lucide-react";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:5000";
+import { useAuth } from "@clerk/nextjs";
+import { API_BASE_URL, authFetch } from "@/lib/apiClient";
 
 interface IndustryViewProps {
   selectedSubCategory: any;
@@ -70,6 +70,7 @@ const IndustryFlowDiagram = dynamic(
 );
 
 export default function IndustryView({ selectedSubCategory }: IndustryViewProps) {
+  const { getToken } = useAuth();
   const [viewMode, setViewMode] = useState<"qualitative" | "preventive">("qualitative");
   const [preventiveData, setPreventiveData] = useState<any>(null);
   const [industryEquipment, setIndustryEquipment] = useState<any[] | null>(null);
@@ -116,11 +117,11 @@ export default function IndustryView({ selectedSubCategory }: IndustryViewProps)
   // Fetch industry-specific equipment roster when industry changes
   useEffect(() => {
     setIndustryEquipment(null);
-    fetch(`${API_BASE_URL}/preventive/equipment/${selectedSubCategory.id}`)
+    authFetch(getToken, `${API_BASE_URL}/preventive/equipment/${selectedSubCategory.id}`)
       .then((r) => r.json())
       .then((d) => setIndustryEquipment(d.equipment ?? null))
       .catch(() => setIndustryEquipment(null));
-  }, [selectedSubCategory.id]);
+  }, [selectedSubCategory.id, getToken]);
 
   // Reset analysis when industry changes
   // Reset EVERYTHING (including slider parameters) when the actual industry changes
@@ -168,7 +169,7 @@ export default function IndustryView({ selectedSubCategory }: IndustryViewProps)
     };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze/with-insights`, {
+      const response = await authFetch(getToken, `${API_BASE_URL}/analyze/with-insights`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -480,7 +481,7 @@ return (
                   setPreventiveData(null);
                   try {
                     const equipment = mode === "collective" ? data : [data];
-                    const res = await fetch(`${API_BASE_URL}/preventive/analyze`, {
+                    const res = await authFetch(getToken, `${API_BASE_URL}/preventive/analyze`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
